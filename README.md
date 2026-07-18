@@ -1,3 +1,13 @@
+---
+title: Olist Churn Prediction
+emoji: 📊
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+app_file: app.py
+pinned: false
+---
+
 # 🛒 Olist E-Commerce: Customer Churn vs. Propensity to Repeat Purchase
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1P-7nMDfGk2LDeovcO7_sQjGsMtamnlLh?usp=sharing)
 

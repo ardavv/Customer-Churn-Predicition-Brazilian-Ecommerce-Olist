@@ -31,8 +31,8 @@ jobs:
           # Hapus semua file bawaan dari index dan hapus bersih working directory
           git rm -rf .
           
-          # CUMA ambil 3 file ini yang penting untuk Hugging Face
-          git checkout $COMMIT_SHA -- app.py requirements.txt logreg_pipeline_olist.pkl
+          # CUMA ambil 4 file ini yang penting untuk Hugging Face
+          git checkout $COMMIT_SHA -- app.py requirements.txt logreg_pipeline_olist.pkl README.md
           
           # Commit file-file bersih tersebut
           git commit -m "Deploy to HF without large histories"
