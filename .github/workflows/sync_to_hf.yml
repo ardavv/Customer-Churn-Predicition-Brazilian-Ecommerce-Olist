@@ -18,4 +18,17 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push --force https://ardavv:$HF_TOKEN@huggingface.co/spaces/ardavv/churn-prediction-olist main
+          # Bikin identitas git sementara
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          
+          # Pindah ke branch sementara khusus untuk deploy HF
+          git checkout -b deploy-hf
+          
+          # Hapus file notebook dari tracking (cuma di action ini, di repo asli aman)
+          git rm -r --cached notebooks/ || true
+          git rm --cached *.ipynb || true
+          git commit -m "Remove large notebook files for Hugging Face deploy" || true
+          
+          # Push branch sementara ini ke branch main di Hugging Face
+          git push --force https://ardavv:$HF_TOKEN@huggingface.co/spaces/ardavv/churn-prediction-olist deploy-hf:main
