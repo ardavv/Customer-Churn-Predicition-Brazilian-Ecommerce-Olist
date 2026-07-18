@@ -159,11 +159,11 @@ with gr.Blocks(title="Olist Churn Predictor") as demo:
             """
             Berdasarkan analisis *SHapley Additive exPlanations (SHAP)* terhadap model *Logistic Regression* ini, berikut adalah 3 faktor kausalitas paling krusial yang menentukan *churn* tidaknya seorang pelanggan Olist:
             
-            * 🔴 **Kecepatan Persetujuan Transaksi (*Purchased Approved*)**: Merupakan faktor **paling dominan**. Keterlambatan pada fase pemrosesan awal (dari menekan tombol beli hingga disetujui) meningkatkan probabilitas model untuk memprediksi *churn* secara drastis.
-            * ⭐ **Skor Ulasan (*Review Score*)**: Kepuasan historis berpengaruh kuat secara linier. Rekam jejak ulasan rendah berkontribusi langsung pada orientasi model memprediksi pelanggan akan pergi.
-            * 🟢 **Volume & Frekuensi (*Outlier* Penekan Churn)**: Pelanggan yang membeli barang dalam volume besar per pesanan (*avg_items_per_order*) atau sering berbelanja, terbukti memiliki **resistensi masif** terhadap probabilitas *churn*.
+            * **Kecepatan Persetujuan Transaksi (*Purchased Approved*)**: Merupakan faktor **paling dominan**. Keterlambatan pada fase pemrosesan awal (dari menekan tombol beli hingga disetujui) meningkatkan probabilitas model untuk memprediksi *churn* secara drastis.
+            * **Skor Ulasan (*Review Score*)**: Kepuasan historis berpengaruh kuat secara linier. Rekam jejak ulasan rendah berkontribusi langsung pada orientasi model memprediksi pelanggan akan pergi.
+            * **Volume & Frekuensi (*Outlier* Penekan Churn)**: Pelanggan yang membeli barang dalam volume besar per pesanan (*avg_items_per_order*) atau sering berbelanja, terbukti memiliki **resistensi masif** terhadap probabilitas *churn*.
             
-            **🎯 Rekomendasi Strategis:** Manajemen Olist direkomendasikan untuk memprioritaskan optimalisasi SLA (*Service Level Agreement*) pada sistem *payment gateway* dan operasional persetujuan, serta memberikan insentif khusus bagi pembeli bervolume besar.
+            **Rekomendasi Strategis:** Manajemen Olist direkomendasikan untuk memprioritaskan optimalisasi SLA (*Service Level Agreement*) pada sistem *payment gateway* dan operasional persetujuan, serta memberikan insentif khusus bagi pembeli bervolume besar.
             """
         )
         
