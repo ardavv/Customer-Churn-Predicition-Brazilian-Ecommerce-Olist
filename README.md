@@ -2,7 +2,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1P-7nMDfGk2LDeovcO7_sQjGsMtamnlLh?usp=sharing)
 
 ## 📌 Project Overview
-Proyek ini mengimplementasikan *pipeline Big Data* dan *Machine Learning end-to-end* untuk mendeteksi serta menganalisis pola retensi pelanggan pada platform Olist Brazilian E-Commerce. Tantangan terbesar dalam dataset ini adalah sifat model bisnisnya: Olist beroperasi sebagai integrator toko perantara (*storefront*) di dalam *marketplace* raksasa, sehingga ketiadaan loyalitas merek (*brand loyalty*) dari konsumen menyebabkan 98,8% populasinya merupakan *one-time buyers*. 
+Proyek ini mengimplementasikan *pipeline Big Data* dan *Machine Learning end-to-end* untuk mendeteksi serta menganalisis pola retensi pelanggan pada platform Olist Brazilian E-Commerce. Tantangan terbesar dalam dataset ini adalah sifat model bisnisnya: Olist beroperasi sebagai integrator toko perantara (*storefront*) di dalam *marketplace* raksasa, sehingga ketiadaan loyalitas merek (*brand loyalty*) dari konsumen menyebabkan 97,02% populasinya merupakan *one-time buyers*. 
 
 Melalui proyek ini, fokus dialihkan dari sekadar mengejar akurasi prediksi mentah menjadi analisis diagnostik kausalitas, serta memberikan rekomendasi perubahan paradigma bisnis dari klasifikasi **"Customer Churn"** menjadi **"Propensity to Repeat Purchase"**.
 
@@ -13,9 +13,9 @@ Proyek ini menggunakan data resmi dari Olist yang tersedia di Kaggle:
 ## 🏗️ Data Architecture (Medallion Architecture)
 Proyek ini mengadopsi kerangka kerja **Medallion Architecture** menggunakan PySpark untuk menjamin skalabilitas pemrosesan data, dengan penerapan mitigasi *Data Leakage* yang ketat:
 
-* **Bronze Layer (Ingestion):** Memuat seluruh data mentah dari tabel eksternal e-commerce Olist dengan skema terstruktur.
-* **Silver Layer (Cleansing & Transformation):** Melakukan *text cleansing* (standarisasi aksen dengan regex), penyaringan status pesanan valid (`delivered`), dan perhitungan selisih waktu. **Catatan:** Tidak ada imputasi *missing values* di lapisan ini. Nilai kosong (Null) dibiarkan mengalir untuk diimputasi secara terisolasi pada fase Machine Learning guna mencegah kebocoran informasi masa depan (*data leakage*).
-* **Gold Layer (Customer Feature Mart):** Agregasi masif pada tingkat pelanggan (*customer level*) untuk membangun *Data Mart* komprehensif yang memuat fitur Transaksional, Geografis, Logistik, dan Sentimen Rating.
+* **Bronze Layer (Ingestion):** Memuat seluruh data mentah dari tabel eksternal e-commerce Olist dengan skema terstruktur (`StructType` eksplisit) untuk memastikan konsistensi tipe data di seluruh node cluster.
+* **Silver Layer (Cleansing & Transformation):** Melakukan *text cleansing* (standarisasi aksen dengan regex nama kota), penyaringan status pesanan valid (`delivered`), dan penanganan nilai ekstrem (*right-skewed outliers*) pada variabel `price` dan `freight_value` menggunakan metode *capping* IQR. **Catatan:** Tidak ada imputasi *missing values* di lapisan ini. Nilai kosong dibiarkan mengalir untuk diimputasi secara terisolasi pada fase Machine Learning guna mencegah kebocoran informasi masa depan (*data leakage*).
+* **Gold Layer (Customer Feature Mart):** Agregasi masif pada tingkat pelanggan (*customer level* berbasis `customer_unique_id`) untuk membangun *Data Mart* komprehensif yang memuat fitur Transaksional, Geografis, Logistik, dan Sentimen Rating.
 
 ## 🧪 Validation Strategy & Time-Window Split
 Untuk mencegah terjadinya kebocoran data, pemrosesan fitur historis dipisahkan secara kaku dari penentuan label target menggunakan metode *Time-Window Split*:
@@ -42,14 +42,15 @@ Model dievaluasi menggunakan metrik yang kebal terhadap ketidakseimbangan kelas 
 | **Random Forest** | 56.35% | 50.20% | 54.23% | 37.27% | 56.77% |
 | **XGBoost** | 54.39% | 50.08% | 51.83% | 36.34% | 55.68% |
 
-**Insight:** *Logistic Regression* (model linier ber-varians rendah) memenangkan evaluasi ini. Pada dataset yang mengalami *data starvation* akibat undersampling dan memiliki ruang fitur yang saling tumpang tindih (*overlapping*), model *ensemble* kompleks seperti Random Forest dan XGBoost cenderung mengalami *overfitting* pada *noise* pelatihan, membuktikan ketiadaan sinyal batas keputusan yang jelas.
+**Insight:** *Logistic Regression* (model linier ber-varians rendah) memenangkan evaluasi ini. Pada dataset yang mengalami *data starvation* akibat undersampling dan memiliki ruang fitur yang saling tumpang tindih (*overlapping*), model *ensemble* kompleks seperti Random Forest dan XGBoost cenderung mengalami *overfitting* pada *noise* pelatihan, membuktikan ketiadaan sinyal batas keputusan yang jelas bagi algoritma berbasis pohon (*tree-based*).
 
 ## 💡 Business & Interpretability Insights (SHAP Analysis)
-Melalui metode *SHapley Additive exPlanations* (SHAP) pada XGBoost, penelitian ini membongkar kekuatan prediktif fitur:
+Melalui metode *SHapley Additive exPlanations* (SHAP) menggunakan `LinearExplainer` pada model terbaik (**Logistic Regression**), proyek ini membongkar kekuatan prediktif dan kausalitas linier dari setiap fitur:
 
-1. **Dominasi Noise pada Sinyal Prediktif:** Meskipun *Global Feature Importance* menempatkan fitur `geolocation_lat`, durasi persetujuan pesanan (`purchased_approved`), dan `freight_ratio` di urutan teratas, visualisasi *SHAP Beeswarm Plot* memperlihatkan sebaran nilai yang sempit dan saling bertumpuk acak (rentang absolut -1.0 hingga 1.0). 
-2. **Ketiadaan Kausalitas Statis:** Fitur dengan nilai ekstrem tinggi maupun rendah tidak secara konsisten mengarahkan probabilitas model pada kelas tertentu. Hal ini membuktikan bahwa atribut operasional statis (logistik & geografis) tidak memiliki kekuatan prediktif (*predictive power*) yang mumpuni untuk membedakan *one-time buyers* dan *repeat buyers*.
-3. **Rekomendasi Strategis:** Mengingat model bisnis Olist, manajemen data sebaiknya menghentikan permodelan klasifikasi biner *Customer Churn* standar. Perusahaan direkomendasikan untuk menggunakan pemodelan **Buy-Till-You-Die (BTYD)** seperti BG/NBD atau **Survival Analysis** untuk memprediksi probabilitas kelompok minoritas bertransaksi kembali berbasis waktu.
+* **purchased_approved (Fitur Paling Dominan):** Menempati urutan pertama pada *Global Feature Importance*. Pemisahan nilai pada *Beeswarm Summary Plot* menunjukkan konsistensi linier yang sangat kaku; nilai fitur yang tinggi (merah) menumpuk di sisi positif (kanan). Ini membuktikan secara empiris bahwa keterlambatan pada fase pemrosesan awal persetujuan transaksi meningkatkan probabilitas model untuk memprediksi *Churn*.
+* **review_score & customer_state_northeastern:** Menjadi fitur penentu dominan berikutnya di peringkat kedua dan ketiga. Pola *review score* memberikan kontribusi linear penting dalam memandu orientasi prediksi model terhadap kepuasan pelanggan secara historis.
+* **avg_items_per_order & frequency (Outlier Penekan Churn):** Kedua fitur ini memiliki pencilan (*outlier*) merah ekstrem yang ditarik jauh ke area negatif (kiri). Hal ini mengindikasikan bahwa pelanggan yang membeli komoditas dalam volume besar dalam sekali transaksi, atau memiliki frekuensi belanja tinggi, memiliki resistensi instan yang masif terhadap probabilitas *churn*.
+* **Rekomendasi Strategis:** Nilai ROC-AUC global yang tertahan di angka ~60.48% membuktikan limitasi fundamental atribut operasional statis pada platform *non-contractual*. Manajemen data Olist direkomendasikan untuk beralih dari klasifikasi biner standar menuju pemodelan **Buy-Till-You-Die (BTYD)** seperti BG/NBD atau **Survival Analysis** guna memprediksi probabilitas kelompok minoritas bertransaksi kembali berbasis waktu (*Propensity to Repeat Purchase*).
 
 ## 🛠️ Requirements & Installation
 Untuk mengeksekusi pipeline ini, pastikan *environment* Anda memiliki pustaka berikut:
