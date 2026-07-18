@@ -2,6 +2,7 @@ import gradio as gr
 import joblib
 import pandas as pd
 import numpy as np
+import spaces
 from sklearn.base import BaseEstimator, TransformerMixin
 
 # ==============================================================================
@@ -46,6 +47,7 @@ except Exception as e:
 # ==============================================================================
 # 3. FUNGSI PREDIKSI
 # ==============================================================================
+@spaces.GPU
 def predict_churn(frequency, monetary, payment_installments, freight_ratio, avg_items_per_order,
                  payment_type, customer_region, purchased_approved, purchased_delivered,
                  delivered_estimated, has_canceled_order, review_score, product_weight_g, product_volume_cm3):
@@ -116,7 +118,7 @@ def predict_churn(frequency, monetary, payment_installments, freight_ratio, avg_
 # ==============================================================================
 # 4. INTERMUKA PENGGUNA (GRADIO UI/UX)
 # ==============================================================================
-with gr.Blocks(title="Olist Churn Predictor", theme=gr.themes.Soft()) as demo:
+with gr.Blocks(title="Olist Churn Predictor") as demo:
     gr.Markdown("# 📊 Aplikasi Prediksi Churn Pelanggan - Olist E-Commerce")
     gr.Markdown("Masukkan data metrik pelanggan di bawah ini untuk memprediksi probabilitas *churn*.")
     
@@ -160,4 +162,4 @@ with gr.Blocks(title="Olist Churn Predictor", theme=gr.themes.Soft()) as demo:
               outputs=[out_proba, out_status])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(theme=gr.themes.Soft())
