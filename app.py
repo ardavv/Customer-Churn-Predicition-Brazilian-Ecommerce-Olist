@@ -81,11 +81,10 @@ def predict_churn(frequency, monetary, payment_installments, freight_ratio, avg_
         # Default categorical dummies ke 0 (karena memakai drop_first=True)
         'customer_state_northeastern': 0,
         'customer_state_northern': 0,
-        'customer_state_southern': 0,
         'customer_state_southeastern': 0,
+        'customer_state_southern': 0,
         'payment_type_credit_card': 0,
         'payment_type_debit_card': 0,
-        'payment_type_not_defined': 0,
         'payment_type_voucher': 0
     }
     
@@ -97,7 +96,6 @@ def predict_churn(frequency, monetary, payment_installments, freight_ratio, avg_
     
     if payment_type == "Credit Card": input_data['payment_type_credit_card'] = 1
     elif payment_type == "Debit Card": input_data['payment_type_debit_card'] = 1
-    elif payment_type == "Not Defined": input_data['payment_type_not_defined'] = 1
     elif payment_type == "Voucher": input_data['payment_type_voucher'] = 1
 
     # Konversi ke DataFrame dengan susunan kolom persis seperti matriks X di training
@@ -132,7 +130,7 @@ with gr.Blocks(title="Olist Churn Predictor") as demo:
             avg_items_per_order = gr.Number(label="Rata-rata Jumlah Item per Order", value=1.0, minimum=1.0)
             
             gr.Markdown("### 💳 Metode Pembayaran & Lokasi")
-            payment_type = gr.Dropdown(label="Metode Pembayaran Utama", choices=["Boleto", "Credit Card", "Debit Card", "Voucher", "Not Defined"], value="Credit Card")
+            payment_type = gr.Dropdown(label="Metode Pembayaran Utama", choices=["Boleto", "Credit Card", "Debit Card", "Voucher"], value="Credit Card")
             customer_region = gr.Dropdown(label="Wilayah Asal Pelanggan (Region)", choices=["Southeastern", "Southern", "Centralwestern", "Northeastern", "Northern"], value="Southeastern")
             
         with gr.Column():
