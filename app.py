@@ -145,15 +145,29 @@ with gr.Blocks(title="Olist Churn Predictor") as demo:
             product_weight_g = gr.Number(label="Rata-rata Berat Produk (Gram)", value=1500.0, minimum=0.0)
             product_volume_cm3 = gr.Number(label="Rata-rata Volume Produk (cm³)", value=5000.0, minimum=0.0)
 
-    btn = gr.Button("🔮 Hitung Probabilitas Churn", variant="primary")
+    btn_predict = gr.Button("🔮 Hitung Probabilitas Churn", variant="primary")
     
     gr.Markdown("---")
     gr.Markdown("### Hasil Analisis Risiko:")
     with gr.Row():
-        out_proba = gr.Textbox(label="Probabilitas Churn", scale=1)
-        out_status = gr.Textbox(label="Status", scale=2)
+        out_proba = gr.Textbox(label="Probabilitas Churn", text_align="center")
+        out_status = gr.Textbox(label="Status Prediksi", text_align="center")
         
-    btn.click(fn=predict_churn, 
+    gr.Markdown("---")
+    with gr.Accordion("💡 Insight Bisnis & Pengaruh Fitur (SHAP Analysis)", open=False):
+        gr.Markdown(
+            """
+            Berdasarkan analisis *SHapley Additive exPlanations (SHAP)* terhadap model *Logistic Regression* ini, berikut adalah 3 faktor kausalitas paling krusial yang menentukan *churn* tidaknya seorang pelanggan Olist:
+            
+            * 🔴 **Kecepatan Persetujuan Transaksi (*Purchased Approved*)**: Merupakan faktor **paling dominan**. Keterlambatan pada fase pemrosesan awal (dari menekan tombol beli hingga disetujui) meningkatkan probabilitas model untuk memprediksi *churn* secara drastis.
+            * ⭐ **Skor Ulasan (*Review Score*)**: Kepuasan historis berpengaruh kuat secara linier. Rekam jejak ulasan rendah berkontribusi langsung pada orientasi model memprediksi pelanggan akan pergi.
+            * 🟢 **Volume & Frekuensi (*Outlier* Penekan Churn)**: Pelanggan yang membeli barang dalam volume besar per pesanan (*avg_items_per_order*) atau sering berbelanja, terbukti memiliki **resistensi masif** terhadap probabilitas *churn*.
+            
+            **🎯 Rekomendasi Strategis:** Manajemen Olist direkomendasikan untuk memprioritaskan optimalisasi SLA (*Service Level Agreement*) pada sistem *payment gateway* dan operasional persetujuan, serta memberikan insentif khusus bagi pembeli bervolume besar.
+            """
+        )
+        
+    btn_predict.click(fn=predict_churn, 
               inputs=[frequency, monetary, payment_installments, freight_ratio, avg_items_per_order,
                       payment_type, customer_region, purchased_approved, purchased_delivered,
                       delivered_estimated, has_canceled_order, review_score, product_weight_g, product_volume_cm3],
