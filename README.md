@@ -9,7 +9,11 @@ pinned: false
 ---
 
 # 🛒 Olist E-Commerce: Customer Churn vs. Propensity to Repeat Purchase
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1P-7nMDfGk2LDeovcO7_sQjGsMtamnlLh?usp=sharing)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ardavv/churn-prediction-olist)
+
+**Live Web App Demo:** 👉 [Olist Churn Predictor on Hugging Face](https://huggingface.co/spaces/ardavv/churn-prediction-olist) 👈
 
 ## 📌 Project Overview
 Proyek ini mengimplementasikan *pipeline Big Data* dan *Machine Learning end-to-end* untuk mendeteksi serta menganalisis pola retensi pelanggan pada platform Olist Brazilian E-Commerce. Tantangan terbesar dalam dataset ini adalah sifat model bisnisnya: Olist beroperasi sebagai integrator toko perantara (*storefront*) di dalam *marketplace* raksasa, sehingga ketiadaan loyalitas merek (*brand loyalty*) dari konsumen menyebabkan 97,02% populasinya merupakan *one-time buyers*. 
@@ -66,3 +70,4 @@ Melalui metode *SHapley Additive exPlanations* (SHAP) menggunakan `LinearExplain
 Untuk mengeksekusi pipeline ini, pastikan *environment* Anda memiliki pustaka berikut:
 ```bash
 pip install pyspark scikit-learn xgboost imbalanced-learn shap seaborn matplotlib folium
+```
